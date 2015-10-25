@@ -1,0 +1,50 @@
+# Constants
+PI = 3.14159265358979323846264338327950288;
+D2R = PI / 180; # degrees -> radians
+R2D = 180 / PI; # radians -> degrees
+tileSize = 256;
+
+# Look-up tables
+Bc = [];
+Cc = [];
+zc = [];
+Ac = [];
+
+# Create our look-up tables
+i = 0;
+while(i < 30)
+{
+    Bc[i] = tileSize/360;
+    Cc[i] = tileSize/(2 * PI);
+    zc[i] = tileSize/2;
+    Ac[i] = tileSize;
+    tileSize = tileSize*2;
+    i = i + 1;
+}
+
+# Logic
+func to_px(ll, zoom)
+{
+    d = zc[zoom];
+    f = min(max(sin(D2R*ll["lat"]), -0.9999), 0.9999);
+    x = round(d + ll["lon"] * Bc[zoom]);
+    y = round(d + 0.5 * log((1 + f)/(1 - f)) * -Cc[zoom]);
+    return ["x": x, "y": y];
+}
+func from_px(px, zoom)
+{
+    g = (px["y"] - zc[zoom]) / -Cc[zoom];
+    lon = (px["x"] - zc[zoom]) / Bc[zoom];
+    lat = R2D * (2 * atan(exp(g)) - 0.5 * PI);
+    return ["lat": lat, "lon": lon];
+}
+
+# Run it!
+lat_lon = ["lat": 51.5033630, "lon": -0.1276250];
+px_result = to_px(lat_lon, 18);
+println("Converting lat, lon: " + lat_lon["lat"] + ", " + lat_lon["lon"] +
+        " to pixels: " + px_result["x"] + ", " + px_result["y"]);
+
+ll_result = from_px(px_result, 18);
+println("Converting pixels: " + px_result["x"] + ", " + px_result["y"] +
+        " to lat, lon: " + ll_result["lat"] + ", " + ll_result["lon"]);

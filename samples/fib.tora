@@ -1,0 +1,16 @@
+func fib(n)
+{
+    if(n < 2)
+    {
+        return n;
+    }
+
+    return fib(n-1) + fib(n-2);
+}
+
+term = 1;
+while(term <= 10)
+{
+    println("Term " + term + " of the Fibonacci sequence is " + fib(term));
+    term = term + 1;
+}
